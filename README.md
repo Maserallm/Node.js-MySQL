@@ -1,1 +1,1 @@
-# Node.js-MySQL
+# Welcome to Bamazon! (Node.js-MySQL)
