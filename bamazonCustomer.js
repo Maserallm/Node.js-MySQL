@@ -25,7 +25,7 @@ function queryShop() {
     if (err) throw err;
     for (let i = 0; i < res.length; i++) {
       console.log(
-        `${res[i].id} | ${res[i].product_name} | ${res[i].department_name} | ${res.price_consumer} | ${res[i].stock_quantity}`
+        `${res[i].id} | ${res[i].product_name} | ${res[i].department_name} | ${res[i].price_consumer} | ${res[i].stock_quantity}`
       );
     }
     runShop();
@@ -52,16 +52,18 @@ function runShop() {
         let userItem = parseFloat(answer.id) - 1;
 
         if (userItem > res.length - 1 || userItem < 0) {
-          connection.end();
+          //connection.end();
           console.log(chalk.bold.red("Please Enter a Valid ID Number."));
+          queryShop();
         } else {
           if (
             answer.quantity > res[userItem].stock_quantity ||
             answer.quantity <= 0 ||
             res[userItem].stock_quantity === 0
           ) {
-            connection.end();
+            //connection.end();
             console.log(chalk.bold.red("Please Enter a Sufficient Quantity."));
+            queryShop();
           } else {
             chosenItem = {
               id: res[userItem].id,
@@ -71,7 +73,7 @@ function runShop() {
               stock_quantity: res[userItem].stock_quantity,
               chosen_quantity: parseFloat(answer.quantity)
             };
-            console.log(chosenItem);
+            console.log(chosenItem.product_name, chosenItem.chosen_quantity);
             updateStock();
           }
         }
@@ -89,4 +91,35 @@ function updateStock() {
       if (err) throw err;
     }
   );
+  completeOrder();
+}
+
+function completeOrder() {
+  let total = chosenItem.chosen_quantity * chosenItem.price_consumer;
+  console.log(
+    chalk.yellow(
+      `${chosenItem.product_name} has been ordered and is on its way!`
+    )
+  );
+  console.log(`Your Total is:`, chalk.green(total));
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "restart",
+        message: "Would you like to continue shopping for other items?",
+        choices: ["Yes", "No"]
+      }
+    ])
+    .then(answer => {
+      if (answer.restart === "Yes") {
+        queryShop();
+      } else {
+        console.log(
+          chalk.whiteBright("Thank for shopping with us at Bamazon!")
+        );
+        connection.end();
+      }
+    });
+  4;
 }
